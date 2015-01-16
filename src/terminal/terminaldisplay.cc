@@ -323,10 +323,11 @@ void Display::put_cell( bool initialized, FrameState &frame, const Framebuffer &
   char tmp[ 64 ];
 
   const Cell *cell = f.get_cell( frame.y, frame.x );
+  const Cell *last_cell = frame.last_frame.get_cell( frame.y, frame.x );
 
   if ( !frame.force_next_put ) {
     if ( initialized
-	 && ( *cell == *(frame.last_frame.get_cell( frame.y, frame.x )) ) ) {
+	 && ( *cell == *last_cell ) ) {
       frame.x += cell->width;
       return;
     }
@@ -402,6 +403,11 @@ void Display::put_cell( bool initialized, FrameState &frame, const Framebuffer &
 	i++ ) {
     snprintf( tmp, 64, "%lc", *i );
     frame.append( tmp );
+  }
+
+  /* if last cell's width is longer than current cell, clear the remainings */
+  for ( int i = 0; i < last_cell->width - cell->width; i++) {
+    frame.append( " " );
   }
 
   frame.x += cell->width;
